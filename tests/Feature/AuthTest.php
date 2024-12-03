@@ -10,77 +10,79 @@ use Tests\TestCase;
 class AuthTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
+
+    // Fungsi untuk melakukan request login dengan payload yang diberikan
+    private function postLogin(array $payload)
+    {
+        return $this->postJson('/api/auth/login', $payload);
+    }
+
+    // Menguji validasi login gagal ketika email tidak valid
     public function test_login_validation_fail()
     {
-        $response = $this->post('/api/auth/login', [
-            'email' => 'invalid-email',
+        $response = $this->postLogin([
+            'email' => 'invalid-email', // Email tidak valid
             'password' => 'password'
         ]);
 
-        $response->assertStatus(422);
+        $response->assertStatus(422); // Memastikan status respons adalah 422 (Unprocessable Entity)
     }
 
+    // Menguji pengguna tidak dapat login dengan email yang tidak ada
     public function test_user_cannot_login_with_nonexistent_email()
     {
-        // Data login dengan email yang tidak terdaftar
         $payload = [
-            'email' => 'nonexistent@example.com',
+            'email' => 'nonexistent@example.com', // Email yang tidak terdaftar
             'password' => 'password123',
         ];
 
-        // Kirim request POST ke endpoint login
-        $response = $this->postJson('/api/auth/login', $payload);
+        $response = $this->postLogin($payload);
 
-        // Cek status response
-        $response->assertStatus(401);
-
-        // Pastikan pesan error sesuai
-        $response->assertJson([
-            'message' => 'Invalid credentials.',
-        ]);
+        $response->assertStatus(401); // Memastikan status respons adalah 401 (Unauthorized)
+        $response->assertJson(['message' => 'Invalid credentials.']); // Memastikan pesan error yang diterima
     }
 
+    // Menguji pengguna tidak dapat login dengan kredensial yang salah
     public function test_user_cannot_login_with_invalid_credentials()
     {
         $payload = [
-            'email' => 'customer@gmail.com',
-            'password' => 'wrong-password',
+            'email' => 'customer@gmail.com', // Email yang terdaftar
+            'password' => 'wrong-password', // Password yang salah
         ];
 
-        $response = $this->postJson('/api/auth/login', $payload);
+        $response = $this->postLogin($payload);
 
-        $response->assertStatus(401);
-        $response->assertJson([
-            'message' => 'Invalid credentials.',
-        ]);
+        $response->assertStatus(401); // Memastikan status respons adalah 401 (Unauthorized)
+        $response->assertJson(['message' => 'Invalid credentials.']); // Memastikan pesan error yang diterima
     }
 
+    // Menguji pengguna dapat login dengan kredensial yang benar
     public function test_user_can_login()
     {
-        User::factory()->create([
+        // Membuat pengguna baru dengan data yang diberikan
+        $user = User::factory()->create([
             'email' => 'test@example',
-            'password' => bcrypt('password')
+            'password' => bcrypt('password'), // Password yang dienkripsi
+            'phone' => '1234567890',
+            'address' => 'Jl. Contoh'
         ]);
 
-        $response = $this->post('/api/auth/login', [
-            'email' => 'test@example',
+        // Melakukan login dengan email dan password yang benar
+        $response = $this->postLogin([
+            'email' => $user->email,
             'password' => 'password'
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(200); // Memastikan status respons adalah 200 (OK)
 
-        // Ambil token dari respons
-        $token = $response->json('token');
+        $token = $response->json('token'); // Mendapatkan token dari respons
 
-        // Kirim permintaan ke endpoint yang membutuhkan autentikasi
+        // Menguji akses endpoint yang membutuhkan autentikasi
         $authenticatedResponse = $this->withHeaders([
-            'Authorization' => "Bearer $token",
+            'Authorization' => "Bearer $token", // Menyertakan token dalam header
         ])->getJson('/api/user');
 
-        // Pastikan user berhasil diautentikasi
-        $authenticatedResponse->assertStatus(200);
-        $authenticatedResponse->assertJson([
-            'email' => 'test@example',
-        ]);
+        $authenticatedResponse->assertStatus(200); // Memastikan status respons adalah 200 (OK)
+        $authenticatedResponse->assertJson(['email' => $user->email]); // Memastikan email pengguna sesuai
     }
 }

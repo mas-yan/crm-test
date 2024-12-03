@@ -11,33 +11,35 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        // validate incoming request
+        // Memvalidasi permintaan yang masuk
         $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email',
-            'password' => 'required|string',
+            'email' => 'required|string|email', // Email harus ada, bertipe string, dan format email yang valid
+            'password' => 'required|string', // Password harus ada dan bertipe string
         ]);
 
-        //if validation fails
+        // Jika validasi gagal
         if ($validator->fails()) {
+            // Mengembalikan respons JSON dengan error validasi dan status 422
             return response()->json($validator->errors(), 422);
         }
 
-        //get credentials from request
+        // Mendapatkan kredensial dari permintaan
         $credentials = $request->only('email', 'password');
 
-        //if auth failed
+        // Jika autentikasi gagal
         if (!$token = auth()->guard('api')->attempt($credentials)) {
+            // Mengembalikan respons JSON dengan pesan error dan status 401
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid credentials.'
             ], 401);
         }
 
-        //if auth success
+        // Jika autentikasi berhasil
         return response()->json([
-            'success' => true,
-            'user'    => auth()->guard('api')->user(),
-            'token'   => $token
+            'success' => true, // Menandakan bahwa autentikasi berhasil
+            'user'    => auth()->guard('api')->user(), // Mengambil data pengguna yang terautentikasi
+            'token'   => $token // Mengembalikan token autentikasi
         ], 200);
     }
 }

@@ -11,11 +11,16 @@ class Employee extends Model
     /** @use HasFactory<\Database\Factories\EmployeeFactory> */
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['user_id', 'company_id', 'name', 'phone', 'address'];
+    protected $fillable = ['user_id', 'phone', 'address'];
 
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function manager()
+    {
+        return $this->belongsTo(Manager::class);
     }
 
     public function user()

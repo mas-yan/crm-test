@@ -11,7 +11,7 @@ class Manager extends Model
     /** @use HasFactory<\Database\Factories\ManagerFactory> */
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['user_id', 'company_id'];
+    protected $fillable = ['user_id', 'company_id',];
 
     public function company()
     {
