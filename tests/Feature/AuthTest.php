@@ -23,7 +23,6 @@ class AuthTest extends TestCase
     public function test_user_cannot_login_with_nonexistent_email()
     {
         // Data login dengan email yang tidak terdaftar
-        $this->withoutExceptionHandling();
         $payload = [
             'email' => 'nonexistent@example.com',
             'password' => 'password123',
@@ -43,7 +42,6 @@ class AuthTest extends TestCase
 
     public function test_user_cannot_login_with_invalid_credentials()
     {
-        $this->withoutExceptionHandling();
         $payload = [
             'email' => 'customer@gmail.com',
             'password' => 'wrong-password',
@@ -59,7 +57,7 @@ class AuthTest extends TestCase
 
     public function test_user_can_login()
     {
-        $user = User::factory()->create([
+        User::factory()->create([
             'email' => 'test@example',
             'password' => bcrypt('password')
         ]);
@@ -77,7 +75,7 @@ class AuthTest extends TestCase
         // Kirim permintaan ke endpoint yang membutuhkan autentikasi
         $authenticatedResponse = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->getJson('/api/auth/user');
+        ])->getJson('/api/user');
 
         // Pastikan user berhasil diautentikasi
         $authenticatedResponse->assertStatus(200);
