@@ -12,8 +12,8 @@ https://github.com/mas-yan/crm-test/blob/master/erd.png
 5. `php artisan key:generate`
 5. `php artisan key:generate --env=testing` untuk testing
 6. Buat Database dengan nama `crm` atau sesuai keinginan anda
-7. `php artisan migrate`
-8. `php artisan db:seed --class=UserSeeder`
+7. `php artisan migrate --seed`
+8. `php artisan migrate --seed --env-testing`
 9. `php artisan jwt:secret`
 10. `php artisan jwt:secret --env=testing` untuk testing
 11. `php artisan test`

@@ -15,6 +15,10 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/user', function (Request $request) {
         return auth()->user();
     });
+    Route::put('/updateProfile', [AuthController::class, 'updateProfile']);
+
+    Route::get('/logout', [AuthController::class, 'logout']);
+
 
     Route::group(['prefix' => 'company'], function () {
         Route::post('/create', [CompanyController::class, 'createCompany']);
