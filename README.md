@@ -1,3 +1,6 @@
+## erd
+https://github.com/mas-yan/crm-test/blob/master/erd.png
+
 ## Cara Install
 
 ### Langkah Instalasi

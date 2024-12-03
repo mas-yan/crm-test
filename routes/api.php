@@ -17,7 +17,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     });
 
     Route::group(['prefix' => 'company'], function () {
-        // Route::post('/create', [CompanyController::class, 'createCompany']);
+        Route::post('/create', [CompanyController::class, 'createCompany']);
     });
 
     Route::group(['prefix' => 'managers', 'middleware' => 'role:manager'], function () {
