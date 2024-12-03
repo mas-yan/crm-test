@@ -23,7 +23,6 @@ class CompanyController extends Controller
                 DB::beginTransaction();
                 $company = Company::create($request->all());
 
-                // Create manager account for the company
                 $managerUser = User::create([
                     'name' => $request->name,
                     'email' => $request->email,
@@ -37,12 +36,11 @@ class CompanyController extends Controller
                 $company->managers()->create(['user_id' => $managerUser->id]);
 
                 DB::commit();
+                return response()->json(['status' => true, 'message' => 'Company created successfully.', 'data' => $company], 201);
             } catch (\Exception $e) {
                 DB::rollBack();
                 response()->json(['status' => false, 'message' => $e->getMessage()], 500);
             }
-
-            return response()->json(['status' => true, 'message' => 'Company created successfully.', 'data' => $company], 201);
         }
 
         return response()->json([
