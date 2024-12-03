@@ -22,7 +22,7 @@ https://github.com/mas-yan/crm-test/blob/master/erd.png
 
 `php artisan serve`
 - Akses http://127.0.0.1:8000/docs/api#/ atau periksa routes pada api.php untuk dokumentasi api
-- ganti email dengan `superAdmin@example.com` dan password `password`
+- pada http://127.0.0.1:8000/docs/api#/operations/auth.login ganti body  email dengan `superAdmin@example.com` dan password `password`
 
 ### note
 saya menggunakan library seperti spatie untuk role, dan scramble untuk dokumentasi api
