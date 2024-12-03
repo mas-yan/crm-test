@@ -31,6 +31,18 @@ class ManagerControllerTest extends TestCase
         return auth()->login($user);
     }
 
+    private function manager($name)
+    {
+        // Membuat user baru dengan nama yang diberikan dan memberikan peran 'manager'
+        $user = User::factory()->create(['name' => $name])->assignRole('manager');
+        // Membuat perusahaan baru dengan nama yang sama
+        $company = Company::factory(['name' => $name])->create();
+        // Membuat manager baru yang terhubung dengan user dan perusahaan yang baru dibuat
+        $manager = Manager::factory()->create(['user_id' => $user->id, 'company_id' => $company->id]);
+        // Mengembalikan token autentikasi setelah login
+        return $manager;
+    }
+
     public function testIndexReturnsManagers()
     {
         // Membuat manager dengan nama 'Alice' dan mendapatkan token autentikasi
@@ -77,5 +89,33 @@ class ManagerControllerTest extends TestCase
         $response->assertJsonPath('data.0.company.name', 'Alice');
         // Memastikan urutan data kedua dalam respons adalah perusahaan dengan nama 'Bob'
         $response->assertJsonPath('data.1.company.name', 'Bob');
+    }
+
+    public function testDetailManagerExists()
+    {
+        // Membuat data manager
+        $token = $this->createManager('Bob');
+        $man = $this->manager('dev');
+        $response = $this->withHeader('Authorization', "Bearer $token")->getJson('/api/managers/' . $man->id);
+
+        // Memastikan response sukses dan data manager dikembalikan
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => 'success',
+                'message' => 'Detail Manager',
+            ]);
+    }
+
+    public function testDetailManagerNotFound()
+    {
+        $token = $this->createManager('Bob');
+        // Memanggil endpoint detail dengan ID yang tidak ada
+        $response = $this->withHeader('Authorization', "Bearer $token")->getJson('/api/managers/99');
+
+        // Memastikan response 404 dan pesan error
+        $response->assertStatus(404)
+            ->assertJson([
+                'message' => 'Manager not found',
+            ]);
     }
 }

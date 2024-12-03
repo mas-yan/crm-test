@@ -39,10 +39,10 @@ class CompanyController extends Controller
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
-                throw $e;
+                response()->json(['status' => false, 'message' => $e->getMessage()], 500);
             }
 
-            return response()->json(['status' => true, 'data' => $company], 201);
+            return response()->json(['status' => true, 'message' => 'Company created successfully.', 'data' => $company], 201);
         }
 
         return response()->json([
